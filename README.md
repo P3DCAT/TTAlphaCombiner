@@ -58,3 +58,9 @@ For example, to rewrite all models using JPG+RGB textures in `phase_6/modules`, 
 ```
 python -m alphacombiner.Main --jpg --rgb --convert-images --phase-files C:/Data/Toontown/resources C:/Data/Toontown/resources/phase_6/modules/*.bam
 ```
+
+### Known Bugs
+
+Some RGB files, mostly those used for fonts, are grayscale but with transparency enabled. For example: `phase_3/maps/phase_3_palette_2tmlc_1.rgb` used by `phase_3/models/fonts/MickeyFont.bam`
+
+Those RGB files cannot be read by Pillow, and, as such, cannot be converted to PNG textures by the `--convert-images` flag. For now, convert those special grayscale transparent RGB images manually using GIMP.
