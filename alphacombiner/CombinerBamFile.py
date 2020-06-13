@@ -14,7 +14,7 @@ class CombinerBamFile(BamFile):
         
         if not target_ids:
             # This model has no textures.
-            return
+            return []
 
         modified_textures = []
 
