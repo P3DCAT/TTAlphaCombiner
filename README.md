@@ -61,7 +61,7 @@ python -m alphacombiner.Main --jpg --rgb --convert-images --phase-files C:/Data/
 
 ## Caveats
 
-You might already have some PNG files that are different than the JPG+RGB combo textures. Such an example might be `toontown-logo.jpg` (old Toontown logo) and `toontown-logo.png` (your project's logo). The PNG file will be overwritten if using `--convert-images`. Beware.
+You might already have some PNG files that are different than the JPG+RGB combo textures. Such an example might be `toontown-logo.jpg` (old Toontown logo) and `toontown-logo.png` (your project's logo). The PNG file will be overwritten when using `--convert-images`. Beware.
 
 Some alpha RGB channels are larger than the source JPG file. Alpha Combiner will complain. Those files have to be fixed manually. (Only when using `--convert-images`)
 
