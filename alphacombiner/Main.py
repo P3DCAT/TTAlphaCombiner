@@ -56,6 +56,12 @@ def main():
             files.append(filename)
 
         for file in files:
+            basename, ext = os.path.splitext(os.path.basename(file))
+
+            if basename.endswith('_png'):
+                # This is one of our converted _png BAM files
+                continue
+
             bam = CombinerBamFile()
 
             with open(file, 'rb') as f:
@@ -65,18 +71,22 @@ def main():
             if args.overwrite:
                 target_filename = file
             else:
-                basename, ext = os.path.splitext(os.path.basename(file))
                 target_filename = os.path.join(os.path.dirname(file), basename + '_png' + ext)
 
             textures = bam.switch_texture_mode(args.jpg, args.rgb)
 
             if args.convert_images:
-                converter.convert_textures(textures)
+                converter.convert_textures(textures, model_path=target_filename)
 
                 if args.wipe_jpg:
                     for texture in textures:
                         if texture not in to_wipe:
                             to_wipe.append(texture)
+
+            if args.overwrite and not textures:
+                # We are overwriting the files, but we haven't changed any textures.
+                # Why bother rewriting the BAM?
+                continue
 
             with open(target_filename, 'wb') as f:
                 print('Writing', target_filename + '...')
