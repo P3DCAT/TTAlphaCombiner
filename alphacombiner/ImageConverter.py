@@ -64,10 +64,18 @@ class ImageConverter(object):
             width, height = output_img.size
 
             # Merge RGB and Alpha data
-            for i in range(width):
-                for j in range(height):
-                    r, g, b = rgb_pixels[i,j]
-                    output_pixels[i,j] = (r, g, b, alpha_pixels[i,j])
+            if img.getbands() == ('L',):
+                # Grayscale image
+                for i in range(width):
+                    for j in range(height):
+                        l = rgb_pixels[i,j]
+                        output_pixels[i,j] = (l, l, l, alpha_pixels[i,j])
+            else:
+                # RGB image
+                for i in range(width):
+                    for j in range(height):
+                        r, g, b = rgb_pixels[i,j]
+                        output_pixels[i,j] = (r, g, b, alpha_pixels[i,j])
 
         output_img.save(png_tex_path)
 
