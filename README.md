@@ -61,6 +61,8 @@ python -m alphacombiner.Main --jpg --rgb --convert-images --phase-files C:/Data/
 
 ## Caveats
 
+You might already have some PNG files that are different than the JPG+RGB combo textures. Such an example might be `toontown-logo.jpg` (old Toontown logo) and `toontown-logo.png` (your project's logo). The PNG file will be overwritten. Beware.
+
 Some alpha RGB channels are larger than the source JPG file. Alpha Combiner will complain. Those files have to be fixed manually. (Only when using `--convert-images`)
 
 Some RGB files used by fonts have both grayscale and transparency channels. Pillow can't open these and these have to be converted manually. (Only when using `--convert-images`)
