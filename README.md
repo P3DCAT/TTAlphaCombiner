@@ -7,8 +7,8 @@ This tool is capable of rewriting BAM files while preserving all node data.
 It can either rewrite all BAM files in-place or create new copies of each BAM file.
 By default, `_png` is appended to the end of each BAM filename.
 
-* Use the `--jpg` flag to rewrite regular JPG textures without RGB files.
-* Use the `--rgb` flag to rewrite JPG+RGB combo textures.
+* Use the `--jpg` flag to rewrite BAM files using regular JPG textures without RGB files.
+* Use the `--rgb` flag to rewrite BAM files using JPG+RGB combo textures.
 * Use the `--overwrite` flag to overwrite all BAM files in-place.
 * Using the `--convert-images` flag, Alpha Combiner will convert all JPG and RGB files associated with your models to PNG automatically.
 * Use the `--wipe-jpg` flag if you want all converted JPG files to be deleted after conversion. Requires the `--convert-images` flag.
