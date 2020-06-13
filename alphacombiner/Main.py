@@ -44,11 +44,7 @@ def main():
     print_enabled(args.convert_images, 'Converting images to PNG in place')
     print_enabled(args.convert_images and args.wipe_jpg, 'Wiping old JPG images')
 
-    converter = ImageConverter(args.early_exit)
-
-    if args.convert_images:
-        converter.set_model_path(args.phase_files)
-
+    converter = ImageConverter(args.phase_files, args.early_exit)
     to_wipe = []
 
     for filename in args.filenames:

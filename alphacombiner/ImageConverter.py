@@ -1,4 +1,3 @@
-from direct.showbase.Loader import Loader
 from PIL import Image
 import os
 
@@ -11,16 +10,9 @@ import os
 """
 class ImageConverter(object):
 
-    def __init__(self, early_exit=False):
-        self.loader = None
-        self.model_path = None
-        self.early_exit = early_exit
-
-    def set_model_path(self, model_path):
-        from direct.showbase.Loader import Loader
-
+    def __init__(self, model_path, early_exit=False):
         self.model_path = model_path
-        self.loader = Loader(None)
+        self.early_exit = early_exit
 
     def print_exc(self, *args):
         if self.early_exit:
@@ -29,8 +21,8 @@ class ImageConverter(object):
         print(*args)
 
     def convert_texture(self, texture):
-        if not self.loader:
-            self.print_exc('No loader specified in ImageConverter.')
+        if not self.model_path:
+            self.print_exc('No model path specified in ImageConverter.')
             return
 
         tex_path = texture[0]
