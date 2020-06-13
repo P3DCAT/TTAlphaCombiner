@@ -59,7 +59,15 @@ For example, to rewrite all models using JPG+RGB textures in `phase_6/modules`, 
 python -m alphacombiner.Main --jpg --rgb --convert-images --phase-files C:/Data/Toontown/resources C:/Data/Toontown/resources/phase_6/modules/*.bam
 ```
 
-### Known Bugs
+## Caveats
+
+Some alpha RGB channels are larger than the source JPG file. Alpha Combiner will complain. Those files have to be fixed manually. (Only when using `--convert-images`)
+
+Some RGB files used by fonts have both grayscale and transparency channels. Pillow can't open these and these have to be converted manually. (Only when using `--convert-images`)
+
+Errors might occur when using `--convert-images`. To quit the program as soon as an error is encountered, use the `--early-exit` flag. Otherwise, look for lines marked as `ERROR:` in the output after running the program to fix these textures manually.
+
+## Known Bugs
 
 Some RGB files, mostly those used for fonts, are grayscale but with transparency enabled. For example: `phase_3/maps/phase_3_palette_2tmlc_1.rgb` used by `phase_3/models/fonts/MickeyFont.bam`
 
