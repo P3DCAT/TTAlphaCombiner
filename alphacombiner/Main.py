@@ -65,7 +65,7 @@ def main():
             if args.overwrite:
                 target_filename = file
             else:
-                basename, ext = os.path.splitext(file)
+                basename, ext = os.path.splitext(os.path.basename(file))
                 target_filename = os.path.join(os.path.dirname(file), basename + '_png' + ext)
 
             textures = bam.switch_texture_mode(args.jpg, args.rgb)
