@@ -14,8 +14,8 @@ class BamFactory(object):
             'Texture': Texture
         }
 
-    def create(self, handle_name, bam_version, base_name=None):
+    def create(self, bam_file, handle_name, bam_version, base_name=None):
         if handle_name in self.elements:
-            return self.elements[handle_name](bam_version)
+            return self.elements[handle_name](bam_file, bam_version)
         if base_name in self.elements:
-            return self.elements[base_name](bam_version)
+            return self.elements[base_name](bam_file, bam_version)

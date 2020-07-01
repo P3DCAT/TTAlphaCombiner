@@ -9,7 +9,8 @@ from panda3d.core import Datagram, DatagramIterator
 """
 class BamObject(object):
 
-    def __init__(self, bam_version):
+    def __init__(self, bam_file, bam_version):
+        self.bam_file = bam_file
         self.bam_version = bam_version
         self.extra_data = b''
 

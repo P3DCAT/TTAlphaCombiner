@@ -1,6 +1,7 @@
 from panda3d.core import Datagram, DatagramIterator
 from .BamFactory import BamFactory
 from .BamGlobals import *
+import os
 
 """
   TOONTOWN ALPHA COMBINER
@@ -22,7 +23,14 @@ class BamFile(object):
         self.type_handles = {}
         self.objects = []
         self.file_datas = []
+        self.filename = None
         self.bam_factory = BamFactory()
+
+    def set_filename(self, filename):
+        self.filename = os.path.abspath(filename)
+
+    def get_filename(self):
+        return self.filename
 
     def get_handle_id_by_name(self, handle_name):
         if not isinstance(handle_name, str):

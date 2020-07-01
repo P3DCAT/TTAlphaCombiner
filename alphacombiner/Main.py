@@ -25,10 +25,11 @@ def main():
     parser.add_argument('--wipe-jpg', '-w', action='store_true', help='Remove all JPG+RGB files that have been converted to PNG.')
     parser.add_argument('--early-exit', '-e', action='store_true', help='Exit immediately if an image could not be converted properly.')
     parser.add_argument('--phase-files', '-p', help='The location of your phase files. Required for --convert-images.')
+    parser.add_argument('--convert-relative', '-l', action='store_true', help='Convert all relative paths to absolute paths in models.')
     parser.add_argument('filenames', nargs='+', help='The raw input file(s). Accepts * as wildcard.')
     args = parser.parse_args()
 
-    if (args.convert_images or args.wipe_jpg):
+    if (args.convert_images or args.wipe_jpg or args.convert_relative):
         if not args.phase_files:
             parser.print_help()
             print('You must specify your phase files folder!')
@@ -43,6 +44,7 @@ def main():
     print_enabled(args.overwrite, 'Overwriting files in place')
     print_enabled(args.convert_images, 'Converting images to PNG in place')
     print_enabled(args.convert_images and args.wipe_jpg, 'Wiping old JPG images')
+    print_enabled(args.convert_relative, 'Converting relative paths')
 
     converter = ImageConverter(args.phase_files, args.early_exit)
     to_wipe = []
@@ -66,6 +68,7 @@ def main():
 
             with open(file, 'rb') as f:
                 print('Loading', file + '...')
+                bam.set_filename(file)
                 bam.load(f)
 
             if args.overwrite:
@@ -73,7 +76,7 @@ def main():
             else:
                 target_filename = os.path.join(os.path.dirname(file), basename + '_png' + ext)
 
-            textures = bam.switch_texture_mode(args.jpg, args.rgb)
+            textures, modified = bam.switch_texture_mode(args.jpg, args.rgb, args.convert_relative, args.phase_files)
 
             if args.convert_images:
                 converter.convert_textures(textures, model_path=target_filename)
@@ -83,7 +86,7 @@ def main():
                         if texture not in to_wipe:
                             to_wipe.append(texture)
 
-            if args.overwrite and not textures:
+            if args.overwrite and not modified:
                 # We are overwriting the files, but we haven't changed any textures.
                 # Why bother rewriting the BAM?
                 continue
