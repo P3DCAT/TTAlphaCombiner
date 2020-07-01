@@ -24,8 +24,8 @@ def main():
     parser.add_argument('--convert-images', '-c', action='store_true', help='Convert all modified images to PNG in-place.')
     parser.add_argument('--wipe-jpg', '-w', action='store_true', help='Remove all JPG+RGB files that have been converted to PNG.')
     parser.add_argument('--early-exit', '-e', action='store_true', help='Exit immediately if an image could not be converted properly.')
-    parser.add_argument('--phase-files', '-p', help='The location of your phase files. Required for --convert-images.')
     parser.add_argument('--convert-relative', '-l', action='store_true', help='Convert all relative paths to absolute paths in models.')
+    parser.add_argument('--phase-files', '-p', help='The location of your phase files. Required for --convert-images.')
     parser.add_argument('filenames', nargs='+', help='The raw input file(s). Accepts * as wildcard.')
     args = parser.parse_args()
 

@@ -7,13 +7,16 @@ This tool is capable of rewriting BAM files while preserving all node data.
 It can either rewrite all BAM files in-place or create new copies of each BAM file.
 By default, `_png` is appended to the end of each BAM filename.
 
+TT Alpha Combiner can also be used to convert relative texture paths to absolute paths. For example, it can replace `../../maps/test_texture.jpg` with `phase_3/maps/test_texture.png`. Simply set the `--convert-relative` flag together with the `--phase-files` location!
+
 * Use the `--jpg` flag to rewrite BAM files using regular JPG textures without RGB files.
 * Use the `--rgb` flag to rewrite BAM files using JPG+RGB combo textures.
 * Use the `--overwrite` flag to overwrite all BAM files in-place.
 * Using the `--convert-images` flag, Alpha Combiner will convert all JPG and RGB files associated with your models to PNG automatically.
 * Use the `--wipe-jpg` flag if you want all converted JPG files to be deleted after conversion. Requires the `--convert-images` flag.
 * Use the `--early-exit` flag to halt execution of the program if any textures are missing.
-* The `--convert-images` flag requires you to set the phase files location using `--phase-files`. Example: `--phase-files C:/Data/Toontown/resources`, `resources` being the folder that stores `phase_3`, `phase_4`, etc.
+* The `--convert-images` and `--convert-relative` flag requires you to set the phase files location using `--phase-files`. Example: `--phase-files C:/Data/Toontown/resources`, `resources` being the folder that stores `phase_3`, `phase_4`, etc.
+* Use the `--convert-relative` flag in order to convert relative file paths such as `../../maps/test_texture.jpg` to `phase_3/maps/test_texture.jpg`.
 
 Wildcards can be used to specify the models to rewrite, but are not required.
 
@@ -34,7 +37,7 @@ python -m pip install -r requirements.txt
 ## Running
 
 ```
-usage: python -m alphacombiner.Main [-h] [--jpg] [--rgb] [--overwrite] [--convert-images] [--wipe-jpg] [--early-exit] [--phase-files PHASE_FILES] filenames [filenames ...]
+usage: python -m alphacombiner.Main [-h] [--jpg] [--rgb] [--overwrite] [--convert-images] [--wipe-jpg] [--early-exit] [--convert-relative] [--phase-files PHASE_FILES] filenames [filenames ...]
 
 This script can be used to convert Panda3D bam models using JPG+RGB textures to use PNG textures.
 
@@ -49,6 +52,8 @@ optional arguments:
   --convert-images, -c  Convert all modified images to PNG in-place.
   --wipe-jpg, -w        Remove all JPG+RGB files that have been converted to PNG.
   --early-exit, -e      Exit immediately if an image could not be converted properly.
+  --convert-relative, -l
+                        Convert all relative paths to absolute paths in models.
   --phase-files PHASE_FILES, -p PHASE_FILES
                         The location of your phase files. Required for --convert-images.
 ```
@@ -57,6 +62,12 @@ For example, to rewrite all models using JPG+RGB textures in `phase_6/modules`, 
 
 ```
 python -m alphacombiner.Main --jpg --rgb --convert-images --phase-files C:/Data/Toontown/resources C:/Data/Toontown/resources/phase_6/modules/*.bam
+```
+
+To simply rewrite all models in `phase_6/modules`, converting all relative paths to absolute paths, without converting any JPG or RGB textures:
+
+```
+python -m alphacombiner.Main --convert-relative --phase-files C:/Data/Toontown/resources C:/Data/Toontown/resources/phase_6/modules/*.bam
 ```
 
 ## Caveats
