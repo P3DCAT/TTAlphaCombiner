@@ -46,27 +46,38 @@ class Texture(BamObject):
 
         dg.append_data(self.texture_data)
 
+    def convert_path_to_absolute(self, model_dir, filename):
+        filename = os.path.abspath(os.path.join(model_dir, filename))
+        filename = os.path.relpath(filename, base_folder)
+        filename = filename.replace('\\', '/')
+
+        return filename
+
     def transform_relative(self, base_folder):
         model_dir = os.path.dirname(self.bam_file.get_filename())
         modified = False
 
-        if self.filename and '..' in self.filename:
-            filename = os.path.abspath(os.path.join(model_dir, self.filename))
-            filename = os.path.relpath(filename, base_folder)
-            filename = filename.replace('\\', '/')
+        if self.filename:
+            filename = self.filename.strip('\\/')
 
-            print('Transformed', self.filename, 'to', filename)
-            self.filename = filename
-            modified = True
+            if '..' in filename:
+                filename = self.convert_path_to_absolute(model_dir, filename)
 
-        if self.alpha_filename and '..' in self.alpha_filename:
-            alpha_filename = os.path.abspath(os.path.join(model_dir, self.alpha_filename))
-            alpha_filename = os.path.relpath(alpha_filename, base_folder)
-            alpha_filename = alpha_filename.replace('\\', '/')
+            if filename != self.filename:
+                print('Transformed', self.filename, 'to', filename)
+                self.filename = filename
+                modified = True
 
-            print('Transformed', self.alpha_filename, 'to', alpha_filename)
-            self.alpha_filename = alpha_filename
-            modified = True
+        if self.alpha_filename:
+            alpha_filename = self.alpha_filename.strip('\\/')
+
+            if '..' in alpha_filename:
+                alpha_filename = self.convert_path_to_absolute(model_dir, alpha_filename)
+
+            if alpha_filename != self.alpha_filename:
+                print('Transformed', self.alpha_filename, 'to', alpha_filename)
+                self.alpha_filename = alpha_filename
+                modified = True
 
         return modified
 
