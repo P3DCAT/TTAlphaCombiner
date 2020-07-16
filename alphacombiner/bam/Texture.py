@@ -46,7 +46,7 @@ class Texture(BamObject):
 
         dg.append_data(self.texture_data)
 
-    def convert_path_to_absolute(self, model_dir, filename):
+    def convert_path_to_absolute(self, base_folder, model_dir, filename):
         filename = os.path.abspath(os.path.join(model_dir, filename))
         filename = os.path.relpath(filename, base_folder)
         filename = filename.replace('\\', '/')
@@ -61,7 +61,7 @@ class Texture(BamObject):
             filename = self.filename.strip('\\/')
 
             if '..' in filename:
-                filename = self.convert_path_to_absolute(model_dir, filename)
+                filename = self.convert_path_to_absolute(base_folder, model_dir, filename)
 
             if filename != self.filename:
                 print('Transformed', self.filename, 'to', filename)
@@ -72,7 +72,7 @@ class Texture(BamObject):
             alpha_filename = self.alpha_filename.strip('\\/')
 
             if '..' in alpha_filename:
-                alpha_filename = self.convert_path_to_absolute(model_dir, alpha_filename)
+                alpha_filename = self.convert_path_to_absolute(base_folder, model_dir, alpha_filename)
 
             if alpha_filename != self.alpha_filename:
                 print('Transformed', self.alpha_filename, 'to', alpha_filename)
