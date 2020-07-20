@@ -10,6 +10,7 @@ import os
   Author: Disyer
   Date: 2020/06/13
 """
+
 class BamFile(object):
     HEADER = b'pbj\x00\n\r'
 
@@ -71,7 +72,7 @@ class BamFile(object):
 
     def load(self, f):
         if f.read(len(self.HEADER)) != self.HEADER:
-            raise Exception('Invalid BAM header.')
+            raise InvalidBAMException('Invalid BAM header.')
 
         dg = Datagram(f.read())
         di = DatagramIterator(dg)

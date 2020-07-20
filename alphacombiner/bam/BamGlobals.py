@@ -6,6 +6,9 @@
   Date: 2020/06/13
 """
 
+class InvalidBAMException(Exception):
+    pass
+
 READ_UINT32 = False
 WRITE_UINT32 = False
 

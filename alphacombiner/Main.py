@@ -1,3 +1,4 @@
+from .bam.BamGlobals import *
 from .CombinerBamFile import CombinerBamFile
 from .ImageConverter import ImageConverter
 import argparse, glob, os
@@ -67,9 +68,14 @@ def main():
             bam = CombinerBamFile()
 
             with open(file, 'rb') as f:
-                print('Loading', file + '...')
+                print(f'Loading {file}...')
                 bam.set_filename(file)
-                bam.load(f)
+
+                try:
+                    bam.load(f)
+                except InvalidBAMException:
+                    print(f'{file} is not a BAM file, skipping...')
+                    continue
 
             if args.overwrite:
                 target_filename = file
