@@ -26,12 +26,11 @@ Your Python version must be at least 3.6, but newer versions are appreciated.
 
 Make sure you've got Panda3D installed. The newer, the better.
 
-You must clone the repository. This project has one dependency: `Pillow`, which can be installed using pip.
+You must clone the repository. This project has no dependencies.
 
 ```
 git clone https://github.com/darktohka/TTAlphaCombiner
 cd TTAlphaCombiner
-python -m pip install -r requirements.txt
 ```
 
 ## Running

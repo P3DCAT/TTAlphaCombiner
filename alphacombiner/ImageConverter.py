@@ -1,4 +1,4 @@
-from PIL import Image
+from panda3d.core import Filename, PNMImage
 import os
 
 """
@@ -20,6 +20,49 @@ class ImageConverter(object):
             raise Exception(' '.join(args))
 
         print(*args)
+
+    def read_texture(self, filename, alpha=False):
+        """
+        Reads a texture from the model path.
+        Throws a PalettizerException if file could not be found.
+            :filename: Relative filename pointing to a texture file in the model path.
+            :alpha: Do we need an alpha channel?
+        """
+        img = PNMImage()
+        img.read(Filename.from_os_specific(filename))
+
+        if alpha:
+            needs_alpha_fill = img.num_channels not in (2, 4)
+            img.set_color_type(4)
+
+            if needs_alpha_fill:
+                # We need an alpha channel no matter what, so if the image does not have one,
+                # it needs to be filled immediately with opaque pixels as it starts out with transparent pixels
+                img.alpha_fill(1)
+        else:
+            img.set_color_type(3)
+
+        return img
+
+    def resize_image(self, image, x_size, y_size):
+        """
+        Resize an image using the Gaussian blur algorithm.
+            :image: A PNMImage representing your image data.
+            :x_size: The desired X size of the texture.
+            :y_size: The desired Y size of the texture.
+        """
+        if image.get_x_size() == x_size and image.get_y_size() == y_size:
+            # This image does not need to be resized!
+            return image
+
+        print(f'Implicit resize from ({image.get_x_size()}, {image.get_y_size()}) to {x_size, y_size}')
+
+        # Resize the image using Panda3D's gaussian filter algorithm, to fit our x_size and y_size.
+        # WARNING! This blurs the image if too small!!! (Gaussian blur)
+        new_image = PNMImage(x_size, y_size, image.get_num_channels(), image.get_maxval(), image.get_type())
+        new_image.gaussian_filter_from(1.0, image)
+
+        return new_image
 
     def convert_texture(self, texture, model_path=None):
         if not self.model_path:
@@ -47,16 +90,12 @@ class ImageConverter(object):
 
         print('Converting to PNG...', png_tex_path)
 
-        try:
-            img = Image.open(tex_path)
-        except Exception as e:
-            self.print_exc('ERROR: Could not convert {}: Could not open using Pillow!'.format(tex_path))
-            return
-
         if len(texture) == 1:
             # Only one texture, we can save this immediately
-            output_img = img
+            output_img = self.read_texture(tex_path, alpha=False)
         elif len(texture) == 2:
+            img = self.read_texture(tex_path, alpha=True)
+
             # Two textures: the second one should be a RGB file
             alpha_path = texture[1]
 
@@ -73,49 +112,45 @@ class ImageConverter(object):
                 self.print_exc('ERROR: Could not convert {} with alpha {}: Missing alpha texture!'.format(tex_path, alpha_path))
                 return
 
-            try:
-                alpha_img = Image.open(alpha_path)
-            except Exception as e:
-                self.print_exc('ERROR: Could not convert {} with alpha {}: Could not open alpha file using Pillow!'.format(tex_path, alpha_path))
-                return
+            alpha_img = PNMImage()
+            alpha_img.read(Filename.from_os_specific(alpha_path))
 
-            if alpha_img.size != img.size:
-                self.print_exc('ERROR: Could not convert {} with alpha {}: Image size and alpha size does NOT match! Image: {} Alpha: {}'.format(tex_path, alpha_path, img.size, alpha_img.size))
-                return
+            alpha_img = self.resize_image(alpha_img, img.get_x_size(), img.get_y_size())
 
-            output_img = Image.new('RGBA', img.size, (255, 255, 255))
+            output_img = PNMImage(img.get_x_size(), img.get_y_size(), 4)
+            output_img.alpha_fill(1)
 
-            rgb_pixels = img.load()
-            alpha_pixels = alpha_img.load()
-            output_pixels = output_img.load()
+            output_img.copy_sub_image(img, 0, 0, 0, 0, img.get_x_size(), img.get_y_size())
 
-            width, height = output_img.size
+            for i in range(img.get_x_size()):
+                for j in range(img.get_y_size()):
+                    output_img.set_alpha(i, j, alpha_img.get_gray(i, j))
 
-            # Merge RGB and Alpha data
-            if img.getbands() == ('L',):
-                # Grayscale image
-                for i in range(width):
-                    for j in range(height):
-                        l = rgb_pixels[i,j]
-                        a = alpha_pixels[i,j]
+        output_img.write(Filename.from_os_specific(png_tex_path))
 
-                        # For alpha RGBs that have more than one channel
-                        if type(a) != int: a = a[0]
+    def convert_all(self):
+        for root, _, files in os.walk(self.model_path):
+            for file in files:
+                full_path = os.path.relpath(os.path.join(root, file), self.model_path)
 
-                        output_pixels[i,j] = (l, l, l, a)
-            else:
-                # RGB image
-                for i in range(width):
-                    for j in range(height):
-                        r, g, b = rgb_pixels[i,j]
-                        a = alpha_pixels[i,j]
+                if not full_path.lower().endswith('.jpg'):
+                    continue
 
-                        # For alpha RGBs that have more than one channel
-                        if type(a) != int: a = a[0]
+                filename_wo_ext = os.path.splitext(full_path)[0]
+                rgb = filename_wo_ext + '_a.rgb'
 
-                        output_pixels[i,j] = (r, g, b, a)
+                if not os.path.exists(os.path.join(self.model_path, rgb)):
+                    rgb = filename_wo_ext + '.rgb'
 
-        output_img.save(png_tex_path)
+                    if not os.path.exists(os.path.join(self.model_path, rgb)):
+                        rgb = None
+
+                if rgb:
+                    input_files = [full_path, rgb]
+                else:
+                    input_files = [full_path]
+
+                self.convert_texture(input_files)
 
     def convert_textures(self, textures, model_path=None):
         for texture in textures:
