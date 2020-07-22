@@ -17,6 +17,22 @@ def print_enabled(flag, description):
     else:
         print('NOT ' + description[0].lower() + description[1:] + '.')
 
+def convert_pack(args, folder):
+    if not os.path.exists(folder) or not os.path.isdir(folder):
+        print(f'Folder {folder} does not exist!')
+
+    converter = ImageConverter(folder, args.early_exit)
+    to_wipe = converter.convert_all(args.phase_files)
+
+    if args.wipe_jpg:
+        converter.wipe_textures(folder, to_wipe)
+
+def main_pack(args):
+    for folder in args.filenames:
+        convert_pack(args, folder)
+
+    print('Done.')
+
 def main():
     parser = argparse.ArgumentParser(description='This script can be used to convert Panda3D bam models using JPG+RGB textures to use PNG textures.')
     parser.add_argument('--jpg', '-j', action='store_true', help='Convert regular JPG textures to PNG textures.')
@@ -27,10 +43,11 @@ def main():
     parser.add_argument('--early-exit', '-e', action='store_true', help='Exit immediately if an image could not be converted properly.')
     parser.add_argument('--convert-relative', '-l', action='store_true', help='Convert all relative paths to absolute paths in models.')
     parser.add_argument('--phase-files', '-p', help='The location of your phase files. Required for --convert-images.')
+    parser.add_argument('--convert-pack', '-b', action='store_true', help='Convert all images inside this directory.')
     parser.add_argument('filenames', nargs='+', help='The raw input file(s). Accepts * as wildcard.')
     args = parser.parse_args()
 
-    if (args.convert_images or args.wipe_jpg or args.convert_relative):
+    if (args.convert_images or args.wipe_jpg or args.convert_relative or args.convert_pack):
         if not args.phase_files:
             parser.print_help()
             print('You must specify your phase files folder!')
@@ -39,6 +56,10 @@ def main():
             parser.print_help()
             print('This phase files folder does not exist!')
             return
+
+    if args.convert_pack:
+        main_pack(args)
+        return
 
     print_enabled(args.jpg, 'Converting regular JPG textures to PNG textures')
     print_enabled(args.rgb, 'Converting JPG + RGB texture combos to PNG textures')
@@ -92,7 +113,7 @@ def main():
                         if texture not in to_wipe:
                             to_wipe.append(texture)
 
-            if args.overwrite and not modified:
+            if not modified:
                 # We are overwriting the files, but we haven't changed any textures.
                 # Why bother rewriting the BAM?
                 continue

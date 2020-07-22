@@ -72,12 +72,13 @@ class ImageConverter(object):
         tex_path = texture[0]
         tex_basename = os.path.splitext(os.path.basename(tex_path))[0]
 
-        if '../' in tex_path and model_path:
-            # This texture path is using relative paths.
-            # We assume that the working directory is the model's directory
-            tex_path = os.path.join(os.path.dirname(model_path), tex_path)
-        else:
-            tex_path = os.path.join(self.model_path, tex_path)
+        if not os.path.isabs(tex_path):
+            if '../' in tex_path and model_path:
+                # This texture path is using relative paths.
+                # We assume that the working directory is the model's directory
+                tex_path = os.path.join(os.path.dirname(model_path), tex_path)
+            else:
+                tex_path = os.path.join(self.model_path, tex_path)
 
         tex_path = tex_path.replace('\\', os.sep).replace('/', os.sep)
 
@@ -92,19 +93,31 @@ class ImageConverter(object):
 
         if len(texture) == 1:
             # Only one texture, we can save this immediately
-            output_img = self.read_texture(tex_path, alpha=False)
+            if tex_path.lower().endswith('.rgb'):
+                output_img = PNMImage()
+                output_img.read(Filename.from_os_specific(tex_path))
+
+                if output_img.num_channels in (1, 2) and 'golf_ball' not in tex_path and 'roll-o-dex' not in tex_path: # HACK: Toontown
+                    output_img.set_color_type(4)
+
+                    for i in range(output_img.get_x_size()):
+                        for j in range(output_img.get_y_size()):
+                            output_img.set_alpha(i, j, output_img.get_gray(i, j))
+            else:
+                output_img = self.read_texture(tex_path, alpha=False)
         elif len(texture) == 2:
             img = self.read_texture(tex_path, alpha=True)
 
             # Two textures: the second one should be a RGB file
             alpha_path = texture[1]
 
-            if '../' in alpha_path and model_path:
-                # This texture path is using relative paths.
-                # We assume that the working directory is the model's directory
-                alpha_path = os.path.join(os.path.dirname(model_path), alpha_path)
-            else:
-                alpha_path = os.path.join(self.model_path, alpha_path)
+            if not os.path.isabs(alpha_path):
+                if '../' in alpha_path and model_path:
+                    # This texture path is using relative paths.
+                    # We assume that the working directory is the model's directory
+                    alpha_path = os.path.join(os.path.dirname(model_path), alpha_path)
+                else:
+                    alpha_path = os.path.join(self.model_path, alpha_path)
 
             alpha_path = alpha_path.replace('\\', os.sep).replace('/', os.sep)
 
@@ -128,7 +141,14 @@ class ImageConverter(object):
 
         output_img.write(Filename.from_os_specific(png_tex_path))
 
-    def convert_all(self):
+    def find_file(self, search_path):
+        for filename in search_path:
+            if os.path.exists(filename):
+                return filename
+
+    def convert_all(self, phase_files):
+        to_wipe = []
+
         for root, _, files in os.walk(self.model_path):
             for file in files:
                 full_path = os.path.relpath(os.path.join(root, file), self.model_path)
@@ -137,13 +157,13 @@ class ImageConverter(object):
                     continue
 
                 filename_wo_ext = os.path.splitext(full_path)[0]
-                rgb = filename_wo_ext + '_a.rgb'
-
-                if not os.path.exists(os.path.join(self.model_path, rgb)):
-                    rgb = filename_wo_ext + '.rgb'
-
-                    if not os.path.exists(os.path.join(self.model_path, rgb)):
-                        rgb = None
+                rgb_order = [
+                    os.path.join(self.model_path, filename_wo_ext + '_a.rgb'),
+                    os.path.join(self.model_path, filename_wo_ext + '.rgb'),
+                    os.path.join(phase_files, filename_wo_ext + '_a.rgb'),
+                    os.path.join(phase_files, filename_wo_ext + '.rgb')
+                ]
+                rgb = self.find_file(rgb_order)
 
                 if rgb:
                     input_files = [full_path, rgb]
@@ -151,6 +171,9 @@ class ImageConverter(object):
                     input_files = [full_path]
 
                 self.convert_texture(input_files)
+                to_wipe.append(input_files)
+
+        return to_wipe
 
     def convert_textures(self, textures, model_path=None):
         for texture in textures:
