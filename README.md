@@ -19,7 +19,8 @@ TT Alpha Combiner can also convert old-style content packs to the new PNG system
 * Use the `--early-exit` flag to halt execution of the program if any textures are missing.
 * The `--convert-images` and `--convert-relative` flag requires you to set the phase files location using `--phase-files`. Example: `--phase-files C:/Data/Toontown/resources`, `resources` being the folder that stores `phase_3`, `phase_4`, etc.
 * Use the `--convert-relative` flag in order to convert relative file paths such as `../../maps/test_texture.jpg` to `phase_3/maps/test_texture.jpg`.
-* Use the `--convert-pack` flag to convert old JPG content packs to new PNG content packs.
+* Use the `--convert-pack` flag to convert old JPG content packs to new PNG content packs, together with the `--phase-files` flag to find RGB files.
+* Use the `--convert-to-jpg` flag to convert all PNG images in a folder to JPG+RGB combo textures.
 
 Wildcards can be used to specify the models to rewrite, but are not required.
 
@@ -39,7 +40,9 @@ cd TTAlphaCombiner
 ## Running
 
 ```
-usage: python -m alphacombiner.Main [-h] [--jpg] [--rgb] [--overwrite] [--convert-images] [--wipe-jpg] [--early-exit] [--convert-relative] [--phase-files PHASE_FILES] [--convert-pack] filenames [filenames ...]
+usage: python -m alphacombiner.Main [-h] [--jpg] [--rgb] [--overwrite] [--convert-images] [--wipe-jpg] [--early-exit] [--convert-relative]
+               [--phase-files PHASE_FILES] [--convert-pack] [--convert-to-jpg]
+               filenames [filenames ...]
 
 This script can be used to convert Panda3D bam models using JPG+RGB textures to use PNG textures.
 
@@ -59,6 +62,7 @@ optional arguments:
   --phase-files PHASE_FILES, -p PHASE_FILES
                         The location of your phase files. Required for --convert-images.
   --convert-pack, -b    Convert all images inside this directory.
+  --convert-to-jpg, -z  Convert all PNG images to JPG+RGB in-place.
 ```
 
 For example, to rewrite all models using JPG+RGB textures in `phase_6\modules`, while keeping the original copies of the models, and also converting all JPG+RGB textures to PNG:
@@ -73,10 +77,16 @@ To simply rewrite all models in `phase_6\modules`, converting all relative paths
 python -m alphacombiner.Main --convert-relative --phase-files C:\Data\Toontown\resources C:\Data\Toontown\resources\phase_6\modules\*.bam
 ```
 
-To rewrite an old content pack at `C:\Data\Packs\myamazingpack`, with the old JPG-based phase files at `C:\Data\Toontown\TTOPhaseFiles`, wiping the JPG files afterwards (do backup them first!):
+To rewrite an old content pack at `C:\Data\Packs\myamazingpack`, with the old JPG-based phase files at `C:\Data\Toontown\TTOPhaseFiles`, wiping the JPG files afterwards (do back them up first!):
 
 ```
 python -m alphacombiner.Main --wipe-jpg --phase-files C:\Data\Toontown\TTOPhaseFiles --convert-pack C:\Data\Packs\myamazingpack
+```
+
+To convert all PNG files at `C:\Data\Toontown\pngtextures`, wiping the PNG files afterwards (do back them up first!):
+
+```
+python -m alphacombiner.Main --wipe-jpg --convert-to-jpg C:\Data\Toontown\pngtextures
 ```
 
 ## Caveats
