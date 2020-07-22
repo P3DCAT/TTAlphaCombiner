@@ -27,9 +27,25 @@ def convert_pack(args, folder):
     if args.wipe_jpg:
         converter.wipe_textures(folder, to_wipe)
 
+def convert_to_jpg(args, folder):
+    if not os.path.exists(folder) or not os.path.isdir(folder):
+        print(f'Folder {folder} does not exist!')
+
+    converter = ImageConverter(folder, args.early_exit)
+    to_wipe = converter.convert_all_png_to_jpg_rgb()
+
+    if args.wipe_jpg:
+        converter.wipe_textures(folder, to_wipe)
+
 def main_pack(args):
     for folder in args.filenames:
         convert_pack(args, folder)
+
+    print('Done.')
+
+def main_jpg(args):
+    for folder in args.filenames:
+        convert_to_jpg(args, folder)
 
     print('Done.')
 
@@ -44,8 +60,13 @@ def main():
     parser.add_argument('--convert-relative', '-l', action='store_true', help='Convert all relative paths to absolute paths in models.')
     parser.add_argument('--phase-files', '-p', help='The location of your phase files. Required for --convert-images.')
     parser.add_argument('--convert-pack', '-b', action='store_true', help='Convert all images inside this directory.')
+    parser.add_argument('--convert-to-jpg', '-z', action='store_true', help='Convert all PNG images to JPG+RGB in-place.')
     parser.add_argument('filenames', nargs='+', help='The raw input file(s). Accepts * as wildcard.')
     args = parser.parse_args()
+
+    if args.convert_to_jpg:
+        main_jpg(args)
+        return
 
     if (args.convert_images or args.wipe_jpg or args.convert_relative or args.convert_pack):
         if not args.phase_files:

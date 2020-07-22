@@ -1,4 +1,4 @@
-from panda3d.core import Filename, PNMImage
+from panda3d.core import Filename, PNMImage, PNMFileTypeRegistry
 import os
 
 """
@@ -8,6 +8,9 @@ import os
   Author: Disyer
   Date: 2020/06/13
 """
+
+RGB_TYPE = PNMFileTypeRegistry.get_global_ptr().get_type_from_extension('.rgb')
+
 class ImageConverter(object):
 
     def __init__(self, model_path, early_exit=False):
@@ -63,6 +66,61 @@ class ImageConverter(object):
         new_image.gaussian_filter_from(1.0, image)
 
         return new_image
+
+    def load_img_with_retry(self, img, tex_path):
+        retry = 0
+
+        while not img.read(Filename.from_os_specific(tex_path)):
+            retry += 1
+
+            if retry > 5:
+                return
+
+    def convert_png_to_jpg_rgb(self, tex_path):
+        tex_basename = os.path.splitext(tex_path)[0]
+        img = PNMImage()
+        self.load_img_with_retry(img, tex_path)
+
+        jpg_path = tex_basename + '.jpg'
+
+        x_size = img.get_x_size()
+        y_size = img.get_y_size()
+        output_img = PNMImage(x_size, y_size, 3)
+        output_img.copy_sub_image(img, 0, 0, 0, 0, x_size, y_size)
+
+        jpg_path = tex_basename + '.jpg'
+
+        print(f'Writing JPG {jpg_path}...')
+        output_img.write(Filename.from_os_specific(jpg_path))
+
+        if img.num_channels == 4:
+            alpha_image = PNMImage(x_size, y_size, 1)
+            alpha_image.set_type(RGB_TYPE)
+
+            # Copy alpha channel from source image
+            for i in range(x_size):
+                for j in range(y_size):
+                    alpha_image.set_gray(i, j, img.get_alpha(i, j))
+
+            rgb_path = tex_basename + '_a.rgb'
+
+            print(f'Writing RGB {rgb_path}...')
+            alpha_image.write(Filename.from_os_specific(rgb_path))
+
+    def convert_all_png_to_jpg_rgb(self):
+        to_wipe = []
+
+        for root, _, files in os.walk(self.model_path):
+            for file in files:
+                full_path = os.path.join(root, file)
+
+                if not full_path.lower().endswith('.png'):
+                    continue
+
+                self.convert_png_to_jpg_rgb(full_path)
+                to_wipe.append(full_path)
+
+        return to_wipe
 
     def convert_texture(self, texture, model_path=None):
         if not self.model_path:
