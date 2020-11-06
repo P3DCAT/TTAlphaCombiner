@@ -1,4 +1,5 @@
 from p3bamboo.BamFile import BamFile
+from p3bamboo.BamFactory import BamFactory
 
 """
   TOONTOWN ALPHA COMBINER
@@ -23,7 +24,7 @@ class CombinerBamFile(BamFile):
             if obj['handle_id'] not in target_ids:
                 continue
 
-            node = self.bam_factory.create(self, obj['handle_name'], base_name='Texture', bam_version=self.version)
+            node = BamFactory.create(self, self.version, obj['handle_name'], 'Texture')
             node.load_object(obj)
 
             if convert_relative and node.transform_relative(base_folder):
