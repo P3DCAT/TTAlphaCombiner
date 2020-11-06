@@ -33,7 +33,7 @@ Make sure you've got Panda3D installed. The newer, the better.
 You must clone the repository, and install all dependencies from `requirements.txt` afterwards.
 
 ```
-git clone https://github.com/darktohka/TTAlphaCombiner
+git clone https://github.com/P3DCAT/TTAlphaCombiner
 python -m pip install --upgrade -r requirements.txt
 cd TTAlphaCombiner
 ```
