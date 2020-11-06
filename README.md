@@ -30,10 +30,11 @@ Your Python version must be at least 3.6, but newer versions are appreciated.
 
 Make sure you've got Panda3D installed. The newer, the better.
 
-You must clone the repository. This project has no dependencies.
+You must clone the repository, and install all dependencies from `requirements.txt` afterwards.
 
 ```
 git clone https://github.com/darktohka/TTAlphaCombiner
+python -m pip install --upgrade -r requirements.txt
 cd TTAlphaCombiner
 ```
 

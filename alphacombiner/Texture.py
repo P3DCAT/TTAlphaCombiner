@@ -1,4 +1,4 @@
-from .BamObject import BamObject
+from p3bamboo.BamObject import BamObject
 import os
 
 """

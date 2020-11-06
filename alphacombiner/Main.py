@@ -1,6 +1,8 @@
-from .bam.BamGlobals import *
+from p3bamboo.BamGlobals import InvalidBAMException
+from p3bamboo.BamFactory import BamFactory
 from .CombinerBamFile import CombinerBamFile
 from .ImageConverter import ImageConverter
+from .Texture import Texture
 import argparse, glob, os
 
 """
@@ -15,7 +17,7 @@ def print_enabled(flag, description):
     if flag:
         print(description + '...')
     else:
-        print('NOT ' + description[0].lower() + description[1:] + '.')
+        print(f'NOT {description[0].lower() + description[1:]}.')
 
 def convert_pack(args, folder):
     if not os.path.exists(folder) or not os.path.isdir(folder):
@@ -49,7 +51,12 @@ def main_jpg(args):
 
     print('Done.')
 
+def setup_p3bamboo():
+    BamFactory.register_type('Texture', Texture)
+
 def main():
+    setup_p3bamboo()
+
     parser = argparse.ArgumentParser(description='This script can be used to convert Panda3D bam models using JPG+RGB textures to use PNG textures.')
     parser.add_argument('--jpg', '-j', action='store_true', help='Convert regular JPG textures to PNG textures.')
     parser.add_argument('--rgb', '-r', action='store_true', help='Convert JPG+RGB texture combos to PNG textures.')
