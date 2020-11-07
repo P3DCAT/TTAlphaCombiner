@@ -1,5 +1,4 @@
 from p3bamboo.BamFile import BamFile
-from p3bamboo.BamFactory import BamFactory
 
 """
   TOONTOWN ALPHA COMBINER
