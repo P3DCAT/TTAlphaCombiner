@@ -23,6 +23,4 @@ class CombinerBamFile(BamFile):
                 all_transformations.append(transformation)
                 modified = True
 
-            texture.save()
-
         return all_transformations, modified
