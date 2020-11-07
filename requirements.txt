@@ -1,1 +1,1 @@
-p3bamboo>=1.0.5
+p3bamboo>=1.0.6
