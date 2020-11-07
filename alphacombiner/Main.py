@@ -1,4 +1,4 @@
-from p3bamboo.BamGlobals import InvalidBAMException
+from p3bamboo.BamGlobals import BAMException
 from p3bamboo.BamFactory import BamFactory
 from .CombinerBamFile import CombinerBamFile
 from .ImageConverter import ImageConverter
@@ -122,7 +122,7 @@ def main():
 
                 try:
                     bam.load(f)
-                except InvalidBAMException:
+                except BAMException:
                     print(f'{file} is not a BAM file, skipping...')
                     continue
 

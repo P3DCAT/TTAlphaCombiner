@@ -11,31 +11,19 @@ from p3bamboo.BamFactory import BamFactory
 class CombinerBamFile(BamFile):
 
     def switch_texture_mode(self, convert_jpg, convert_rgb, convert_relative, base_folder):
-        target_ids = self.find_related('Texture')
-
-        if not target_ids:
-            # This model has no textures.
-            return [], False
-
-        modified_textures = []
+        all_transformations = []
         modified = False
 
-        for obj in self.objects:
-            if obj['handle_id'] not in target_ids:
-                continue
-
-            node = BamFactory.create(self, self.version, obj['handle_name'], 'Texture')
-            node.load_object(obj)
-
-            if convert_relative and node.transform_relative(base_folder):
+        for texture in self.get_objects_of_type('Texture'):
+            if convert_relative and texture.transform_relative(base_folder):
                 modified = True
 
-            texture = node.transform_to_png(convert_jpg, convert_rgb)
+            transformation = texture.transform_to_png(convert_jpg, convert_rgb)
 
-            if texture and texture not in modified_textures:
-                modified_textures.append(texture)
+            if transformation and transformation not in all_transformations:
+                all_transformations.append(transformation)
                 modified = True
 
-            node.write_object(write_version=self.version, obj=obj)
+            texture.save()
 
-        return modified_textures, modified
+        return all_transformations, modified

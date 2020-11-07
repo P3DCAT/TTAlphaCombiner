@@ -14,6 +14,8 @@ class Texture(BamObject):
         BamObject.__init__(self, bam_file, bam_version)
 
     def load(self, di):
+        BamObject.load(self, di)
+
         self.name = di.get_string()
         self.filename = di.get_string()
         self.alpha_filename = di.get_string()
@@ -34,6 +36,8 @@ class Texture(BamObject):
         self.texture_data = di.extract_bytes(di.get_remaining_size())
 
     def write(self, write_version, dg):
+        BamObject.write(self, write_version, dg)
+
         dg.add_string(self.name)
         dg.add_string(self.filename)
         dg.add_string(self.alpha_filename)
@@ -113,3 +117,12 @@ class Texture(BamObject):
         self.alpha_file_channel = 0
 
         return transformed
+
+    def __str__(self):
+        return 'Texture(name={0}, filename={1}, alpha_filename={2}, primary_file_num_channels={3}, alpha_file_channel={4})'.format(
+            self.name,
+            self.filename,
+            self.alpha_filename,
+            self.primary_file_num_channels,
+            self.alpha_file_channel
+        )
