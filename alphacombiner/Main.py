@@ -41,13 +41,13 @@ def convert_to_jpg(args, folder):
 
 def main_pack(args):
     for folder in args.filenames:
-        convert_pack(args, folder)
+        convert_pack(args, os.path.abspath(folder))
 
     print('Done.')
 
 def main_jpg(args):
     for folder in args.filenames:
-        convert_to_jpg(args, folder)
+        convert_to_jpg(args, os.path.abspath(folder))
 
     print('Done.')
 
@@ -70,6 +70,9 @@ def main():
     parser.add_argument('--convert-to-jpg', '-z', action='store_true', help='Convert all PNG images to JPG+RGB in-place.')
     parser.add_argument('filenames', nargs='+', help='The raw input file(s). Accepts * as wildcard.')
     args = parser.parse_args()
+
+    if args.phase_files:
+        args.phase_files = os.path.abspath(args.phase_files)
 
     if args.convert_to_jpg:
         main_jpg(args)
@@ -108,6 +111,7 @@ def main():
             files.append(filename)
 
         for file in files:
+            file = os.path.abspath(file)
             basename, ext = os.path.splitext(os.path.basename(file))
 
             if basename.endswith('_png'):
