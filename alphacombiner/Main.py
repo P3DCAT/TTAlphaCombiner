@@ -152,7 +152,7 @@ def main():
 
             with open(target_filename, 'wb') as f:
                 print('Writing', target_filename + '...')
-                bam.write(f, bam.version)
+                bam.write(f)
 
     if args.wipe_jpg:
         converter.wipe_textures(args.phase_files, to_wipe)
